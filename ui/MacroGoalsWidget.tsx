@@ -4,17 +4,22 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
 import { useToast } from "react-native-toast-notifications";
 
+interface Macronutrients {
+	calories: number;
+	protein: number;
+	carbohydrates: number;
+	fats: number;
+}
+
 export default function MacroGoalsWidget() {
 	const userUid = auth.currentUser?.uid;
-	const [targetCals, setTargetCals] = useState(
-		parseInt(targetProtein) * 4 +
-			parseInt(targetCarbs) * 4 +
-			parseInt(targetFats) * 9
+	const [targetProtein, setTargetProtein] = useState<number | null>(null);
+	const [targetCarbs, setTargetCarbs] = useState<number | null>(null);
+	const [targetFats, setTargetFats] = useState<number | null>(null);
+	const [targetCals, setTargetCals] = useState<number | null>(
+		targetProtein * 4 + targetCarbs * 4 + targetFats * 9
 	);
-	const [targetProtein, setTargetProtein] = useState(null);
-	const [targetCarbs, setTargetCarbs] = useState(null);
-	const [targetFats, setTargetFats] = useState(null);
-	const [databaseData, setDatabaseData] = useState();
+	const [databaseData, setDatabaseData] = useState<Macronutrients>();
 	const [macrosChange, setMacrosChange] = useState(false);
 	const toast = useToast();
 
@@ -25,10 +30,10 @@ export default function MacroGoalsWidget() {
 			const macroData = docSnap.data();
 			if (macroData) {
 				setDatabaseData({
-					currCals: macroData.targetCals,
-					currProtein: macroData.targetProtein,
-					currCarbs: macroData.targetCarbs,
-					currFats: macroData.targetFats,
+					calories: macroData.targetCals,
+					protein: macroData.targetProtein,
+					carbohydrates: macroData.targetCarbs,
+					fats: macroData.targetFats,
 				});
 				setTargetProtein(macroData.targetProtein.toString());
 				setTargetCarbs(macroData.targetCarbs.toString());
@@ -41,20 +46,20 @@ export default function MacroGoalsWidget() {
 
 	useEffect(() => {
 		setTargetCals(
-			(parseInt(targetProtein) ? parseInt(targetProtein) : "0") * 4 +
-				(parseInt(targetCarbs) ? parseInt(targetCarbs) : "0") * 4 +
-				(parseInt(targetFats) ? parseInt(targetFats) : "0") * 9
+			(targetProtein ? targetProtein : 0) * 4 +
+				(targetCarbs ? targetCarbs : 0) * 4 +
+				(targetFats ? targetFats : 0) * 9
 		);
 		const currData = {
 			currCals: targetCals,
-			currProtein: parseInt(targetProtein),
-			currCarbs: parseInt(targetCarbs),
-			currFats: parseInt(targetFats),
+			currProtein: targetProtein,
+			currCarbs: targetCarbs,
+			currFats: targetFats,
 		};
 		if (
-			databaseData?.currCarbs !== currData.currCarbs ||
-			databaseData?.currProtein !== currData.currProtein ||
-			databaseData?.currFats !== currData.currFats
+			databaseData?.carbohydrates !== currData.currCarbs ||
+			databaseData?.protein !== currData.currProtein ||
+			databaseData?.fats !== currData.currFats
 		) {
 			setMacrosChange(true);
 		} else {
@@ -67,9 +72,9 @@ export default function MacroGoalsWidget() {
 			const macroRef = doc(db, "macros", userUid);
 			await updateDoc(macroRef, {
 				targetCals: targetCals,
-				targetProtein: parseInt(targetProtein),
-				targetCarbs: parseInt(targetCarbs),
-				targetFats: parseInt(targetFats),
+				targetProtein: targetProtein,
+				targetCarbs: targetCarbs,
+				targetFats: targetFats,
 			});
 			setMacrosChange(false);
 			toast.show("Successfully updated macros", {
@@ -151,9 +156,9 @@ export default function MacroGoalsWidget() {
 					Target Protein
 				</Text>
 				<TextInput
-					value={targetProtein}
+					value={targetProtein.toString()}
 					keyboardType="numeric"
-					onChangeText={(number) => setTargetProtein(number)}
+					onChangeText={(number) => setTargetProtein(parseInt(number))}
 					style={{
 						height: 40,
 						margin: 12,
@@ -179,9 +184,9 @@ export default function MacroGoalsWidget() {
 					Target Carbs
 				</Text>
 				<TextInput
-					value={targetCarbs}
+					value={targetCarbs.toString()}
 					keyboardType="numeric"
-					onChangeText={(number) => setTargetCarbs(number)}
+					onChangeText={(number) => setTargetCarbs(parseInt(number))}
 					style={{
 						height: 40,
 						margin: 12,
@@ -207,9 +212,9 @@ export default function MacroGoalsWidget() {
 					Target Fats
 				</Text>
 				<TextInput
-					value={targetFats}
+					value={targetFats.toString()}
 					keyboardType="numeric"
-					onChangeText={(number) => setTargetFats(number)}
+					onChangeText={(number) => setTargetFats(parseInt(number))}
 					style={{
 						height: 40,
 						margin: 12,

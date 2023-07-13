@@ -48,8 +48,8 @@ export default function Header() {
 				></View>
 				<View
 					style={{
-						justifyContent: "start",
-						alignContent: "start",
+						justifyContent: "flex-start",
+						alignContent: "flex-start",
 						flexDirection: "column",
 						gap: 1,
 					}}

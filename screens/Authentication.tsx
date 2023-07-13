@@ -8,17 +8,13 @@ import NutritionScreen from "./Nutrition-Screen";
 import ProfileScreen from "./Profile-Screen";
 import SignUp from "./SignUp";
 import Login from "./Login";
-import { AuthContext } from "../context/AuthContext";
+import { auth } from "../firebaseConfig";
 
 export default function Authentication() {
 	const [selected, setSelected] = useState(1);
 	const [selectedPreAuth, setSelectedPreAuth] = useState(2);
 	const [user, setUser] = useState(false);
-	const { firebaseUser } = useContext(AuthContext);
-
-	useEffect(() => {
-		setUser(firebaseUser);
-	}, [firebaseUser]);
+	const userUid = auth.currentUser?.uid;
 
 	const authPages = [
 		{
@@ -50,13 +46,13 @@ export default function Authentication() {
 		},
 	];
 
-	if (user) {
+	if (userUid) {
 		return (
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
 				<View
 					style={{
 						flex: 4,
-						justifyContent: "start",
+						justifyContent: "flex-start",
 						alignItems: "center",
 						backgroundColor: "#f9f9f9",
 					}}
@@ -77,7 +73,7 @@ export default function Authentication() {
 				<View
 					style={{
 						flex: 4,
-						justifyContent: "start",
+						justifyContent: "flex-start",
 						alignItems: "center",
 						backgroundColor: "#f9f9f9",
 					}}

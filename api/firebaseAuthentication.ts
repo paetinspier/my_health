@@ -3,23 +3,27 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
 
-export function userSignUp(email, password, firstName, lastName) {
+export function userSignUp(
+	email: string,
+	password: string,
+	firstName: string,
+	lastName: string
+) {
 	createUserWithEmailAndPassword(auth, email, password)
 		.then(async (userCredential) => {
 			const user = userCredential.user;
 			console.log("Successful user  signup ✅", user.uid);
-            const userDoc = await setDoc(doc(db, "users", user.uid), {
-                firstName: firstName,
-                lastName: lastName,
-                isDiabetic: true,
-                email: email,
-                dob: '',
-
-            });
-            console.log("created user in firestore ✅", userDoc);
+			const userDoc = await setDoc(doc(db, "users", user.uid), {
+				firstName: firstName,
+				lastName: lastName,
+				isDiabetic: true,
+				email: email,
+				dob: "",
+			});
+			console.log("created user in firestore ✅", userDoc);
 			return user;
 		})
 		.catch((error) => {
@@ -30,7 +34,7 @@ export function userSignUp(email, password, firstName, lastName) {
 		});
 }
 
-export function userSignIn(email, password) {
+export function userSignIn(email: string, password: string) {
 	signInWithEmailAndPassword(auth, email, password)
 		.then((userCredential) => {
 			const user = userCredential.user;

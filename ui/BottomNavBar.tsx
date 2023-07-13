@@ -1,9 +1,6 @@
-import React, {useState} from "react";
+import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { AntDesign } from '@expo/vector-icons';
-import { Fontisto } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign, Fontisto, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 function BottomNavBar({selected, setSelected}) {
 	const buttons = [

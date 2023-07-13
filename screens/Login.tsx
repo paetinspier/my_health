@@ -1,15 +1,13 @@
-import { useContext, useState } from "react";
-import { Button, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Text, TextInput, TouchableOpacity, View, Button } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
-export default function SignUp({ setSelectedPreAuth }) {
-	const [email, setEmail] = useState();
-	const [password, setPassword] = useState();
-	const [firstName, setFirstName] = useState();
-	const [lastName, setLastName] = useState();
+export default function Login({ setSelectedPreAuth }) {
+	const [email, setEmail] = useState<string>();
+	const [password, setPassword] = useState<string>();
 	const [viewPassword, setViewPassword] = useState(false);
-	const { signUp } = useContext(AuthContext);
+	const { signIn } = useAuth();
 
 	return (
 		<View
@@ -35,48 +33,9 @@ export default function SignUp({ setSelectedPreAuth }) {
 				<Text
 					style={{ color: "black", fontSize: 24, fontWeight: "bold" }}
 				>
-					Sign Up
+					Login
 				</Text>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						height: 40,
-						margin: 12,
-						borderWidth: 1,
-						borderRadius: 20,
-					}}
-				>
-					<TextInput
-						value={firstName}
-						placeholder="First Name"
-						onChangeText={(firstName) => setFirstName(firstName)}
-						style={{
-							flex: 1,
-							padding: 10,
-						}}
-					/>
-				</View>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						height: 40,
-						margin: 12,
-						borderWidth: 1,
-						borderRadius: 20,
-					}}
-				>
-					<TextInput
-						value={lastName}
-						placeholder="Last Name"
-						onChangeText={(lastName) => setLastName(lastName)}
-						style={{
-							flex: 1,
-							padding: 10,
-						}}
-					/>
-				</View>
+
 				<View
 					style={{
 						flexDirection: "row",
@@ -131,7 +90,7 @@ export default function SignUp({ setSelectedPreAuth }) {
 					</TouchableOpacity>
 				</View>
 				<TouchableOpacity
-					onPress={() => setSelectedPreAuth(2)}
+					onPress={() => setSelectedPreAuth(1)}
 					style={{
 						justifyContent: "center",
 						alignItems: "center",
@@ -142,20 +101,18 @@ export default function SignUp({ setSelectedPreAuth }) {
 					<Text style={{ color: "black" }}>
 						Already have an account?
 					</Text>
-					<Text style={{ color: "#2465FD" }}>Login</Text>
+					<Text style={{ color: "#2465FD" }}>Sign Up</Text>
 				</TouchableOpacity>
 				<Button
 					title="Continue"
 					color="#2465FD"
-					onPress={() => signUp(email, password)}
+					onPress={() => signIn(email, password)}
 					disabled={
 						!(
 							email &&
 							email.length > 6 &&
 							password &&
-							password.length > 8 &&
-							firstName &&
-							lastName
+							password.length > 8
 						)
 					}
 				/>

@@ -42,7 +42,7 @@ export default function T1DWidget() {
 			<View
 				style={{
 					width: "100%",
-					justifyContent: "start",
+					justifyContent: "flex-start",
 					alignItems: "center",
 					gap: 3,
 					flexDirection: "row",

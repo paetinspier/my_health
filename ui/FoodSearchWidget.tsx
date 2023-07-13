@@ -37,7 +37,7 @@ export default function FoodSearchWidget() {
 				style={{
 					width: "100%",
 					justifyContent: "center",
-					alignItems: "start",
+					alignItems: "flex-start",
 				}}
 			>
 				<Text
