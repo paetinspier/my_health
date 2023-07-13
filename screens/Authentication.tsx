@@ -8,13 +8,12 @@ import NutritionScreen from "./Nutrition-Screen";
 import ProfileScreen from "./Profile-Screen";
 import SignUp from "./SignUp";
 import Login from "./Login";
-import { auth } from "../firebaseConfig";
+import { useAuth } from "../context/AuthContext";
 
 export default function Authentication() {
 	const [selected, setSelected] = useState(1);
 	const [selectedPreAuth, setSelectedPreAuth] = useState(2);
-	const [user, setUser] = useState(false);
-	const userUid = auth.currentUser?.uid;
+	const { firebaseUser } = useAuth();
 
 	const authPages = [
 		{
@@ -46,7 +45,7 @@ export default function Authentication() {
 		},
 	];
 
-	if (userUid) {
+	if (firebaseUser) {
 		return (
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
 				<View
