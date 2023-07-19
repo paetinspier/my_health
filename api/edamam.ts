@@ -1,34 +1,61 @@
-import axios from "axios";
+// import axios, { AxiosResponse } from "axios";
 
-export async function SearchFoodByName(searchTerm: string) {
-	try {
-		if (!searchTerm || searchTerm.length === 0) return [];
-		const response = await axios.get(
-			`${process.env.EXPO_PUBLIC_EDAMAM_PARSER_API_URL}?app_id=${process.env.EXPO_PUBLIC_EDAMAM_APP_ID}&app_key=${process.env.EXPO_PUBLIC_EDAMAM_API_KEY}&ingr=${searchTerm}&nutrition-type=logging`
-		);
+// export interface Food {
+// 	category: string;
+// 	categoryLabel: string;
+// 	foodId: string;
+// 	image: string;
+// 	knownAs: string;
+// 	label: string;
+// 	nutrients: Nutrients;
+// 	measurements: Measurement[];
+// }
 
-		const result = response.data.hints;
+// interface Nutrients {
+// 	[key: string]: number;
+// 	CHOCDF: number;
+// 	ENERC_KCAL: number;
+// 	FAT: number;
+// 	FIBTG: number;
+// 	PROCNT: number;
+// }
 
-		result.forEach((r) => {
-			const foodData = r.food;
-			const foodMeasurement = r.measurements;
-			const simplifiedFoodData = {
-				category: foodData.category,
-				categoryLabel: foodData.categoryLabel,
-				foodId: foodData.foodId,
-				image: foodData.image,
-				knownAs: foodData.knownAs,
-				label: foodData.label,
-				nutrients: foodData.nutrients,
-				measurements: foodMeasurement,
-			};
+// interface Measurement {
+// 	uri: string;
+// 	label: string;
+// 	weight: number;
+// }
 
-			console.log(simplifiedFoodData.nutrients);
-		});
+// export async function SearchFoodByName(searchTerm: string): Promise<Food[]> {
+// 	try {
+// 		if (!searchTerm || searchTerm.length === 0) return [];
+// 		const response: AxiosResponse<any> = await axios.get(
+// 			`${process.env.EXPO_PUBLIC_EDAMAM_PARSER_API_URL}?app_id=${process.env.EXPO_PUBLIC_EDAMAM_APP_ID}&app_key=${process.env.EXPO_PUBLIC_EDAMAM_API_KEY}&ingr=${searchTerm}&nutrition-type=logging`
+// 		);
 
-		return result;
-	} catch (error) {
-		console.log(error);
-		throw error;
-	}
-}
+// 		const result: any[] = response.data.hints;
+
+// 		const foods: Food[] = result.map((r) => {
+// 			const foodData = r.food;
+// 			const foodMeasurement = r.measures;
+// 			console.log('image url', foodData.image)
+// 			const simplifiedFoodData: Food = {
+// 				category: foodData.category,
+// 				categoryLabel: foodData.categoryLabel,
+// 				foodId: foodData.foodId,
+// 				image: foodData.image,
+// 				knownAs: foodData.knownAs,
+// 				label: foodData.label,
+// 				nutrients: foodData.nutrients,
+// 				measurements: foodMeasurement,
+// 			};
+			
+// 			return simplifiedFoodData;
+// 		});
+
+// 		return foods;
+// 	} catch (error) {
+// 		console.log(error);
+// 		throw error;
+// 	}
+// }

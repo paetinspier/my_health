@@ -1,22 +1,36 @@
 import { useState, useEffect } from "react";
-import { TouchableOpacity, View, Text, Button, TextInput } from "react-native";
-import { SearchFoodByName } from "../api/edamam";
+import { TouchableOpacity, View, Text } from "react-native";
+import { Food } from "../api/models/food.model";
+import FoodSearchByName from "./FoodSearchByName";
+import FoodSearchByBarcode from "./FoodSearchByBarcode";
+import { searchFoodsByTerm } from "../api/foodDatabaseApi";
 
 export default function FoodSearchWidget() {
 	const [searchMode, setSearchMode] = useState(1);
-	const [searchTerm, setSerachTerm] = useState("");
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [foodList, setFoodList] = useState<Food[]>([]);
+	const [selectedFood, setSelectedFood] = useState<Food>();
 
 	useEffect(() => {
 		async function fetchData() {
 			try {
-				const results = await SearchFoodByName(searchTerm);
+				const results = await searchFoodsByTerm(searchTerm, 10);
+				if (results) {
+					setFoodList(results);
+				}
+				else{
+					setFoodList([])
+				}
 			} catch (error) {
 				// Handle the error, e.g., show an error message to the user
-                console.log(error)
+				console.log(error);
 			}
 		}
-
-		fetchData();
+		if (!searchTerm || searchTerm.length === 0 || searchTerm === "") {
+			setFoodList([]);
+		} else {
+			fetchData();
+		}
 	}, [searchTerm]);
 
 	return (
@@ -127,28 +141,22 @@ export default function FoodSearchWidget() {
 				</TouchableOpacity>
 			</View>
 
-			<View
-				style={{
-					flexDirection: "row",
-					alignItems: "center",
-					height: 40,
-					margin: 12,
-					borderWidth: 1,
-					borderRadius: 20,
-					width: "100%",
-				}}
-			>
-				<TextInput
-					value={searchTerm}
-					placeholder="Search for a food..."
-					onChangeText={(term) => setSerachTerm(term)}
-					style={{
-						flex: 1,
-						paddingVertical: 10,
-						paddingHorizontal: 20,
-					}}
+			{searchMode === 1 ? (
+				<FoodSearchByName
+					searchTerm={searchTerm}
+					setSearchTerm={setSearchTerm}
+					foodList={foodList}
+					selectedFood={selectedFood}
+					setSelectedFood={setSelectedFood}
 				/>
-			</View>
+			) : (
+				<View style={{ flex: 1 }}>
+					<FoodSearchByBarcode
+						selectedFood={selectedFood}
+						setSelectedFood={setSelectedFood}
+					/>
+				</View>
+			)}
 		</View>
 	);
 }

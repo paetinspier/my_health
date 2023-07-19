@@ -35,9 +35,9 @@ export default function MacroGoalsWidget() {
 					carbohydrates: macroData.targetCarbs,
 					fats: macroData.targetFats,
 				});
-				setTargetProtein(macroData.targetProtein.toString());
-				setTargetCarbs(macroData.targetCarbs.toString());
-				setTargetFats(macroData.targetFats.toString());
+				setTargetProtein(macroData.targetProtein?.toString());
+				setTargetCarbs(macroData.targetCarbs?.toString());
+				setTargetFats(macroData.targetFats?.toString());
 			}
 		};
 
@@ -156,7 +156,7 @@ export default function MacroGoalsWidget() {
 					Target Protein
 				</Text>
 				<TextInput
-					value={targetProtein.toString()}
+					value={targetProtein?.toString()}
 					keyboardType="numeric"
 					onChangeText={(number) => setTargetProtein(parseInt(number))}
 					style={{
@@ -184,7 +184,7 @@ export default function MacroGoalsWidget() {
 					Target Carbs
 				</Text>
 				<TextInput
-					value={targetCarbs.toString()}
+					value={targetCarbs?.toString()}
 					keyboardType="numeric"
 					onChangeText={(number) => setTargetCarbs(parseInt(number))}
 					style={{
@@ -212,7 +212,7 @@ export default function MacroGoalsWidget() {
 					Target Fats
 				</Text>
 				<TextInput
-					value={targetFats.toString()}
+					value={targetFats?.toString()}
 					keyboardType="numeric"
 					onChangeText={(number) => setTargetFats(parseInt(number))}
 					style={{
