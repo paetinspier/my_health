@@ -147,7 +147,7 @@ export default function SignUp({ setSelectedPreAuth }) {
 				<Button
 					title="Continue"
 					color="#2465FD"
-					onPress={() => signUp(email, password)}
+					onPress={() => signUp(email, password, firstName, lastName)}
 					disabled={
 						!(
 							email &&

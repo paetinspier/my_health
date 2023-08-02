@@ -23,14 +23,14 @@ export function userSignUp(
 				email: email,
 				dob: "",
 			});
-			console.log("created user in firestore ✅", userDoc);
+			console.log("created user in firestore ✅");
 			return user;
 		})
 		.catch((error) => {
 			const errorCode = error.code;
 			const errorMessage = error.message;
-
 			console.log(errorCode, errorMessage);
+			return null;
 		});
 }
 
