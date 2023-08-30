@@ -11,21 +11,22 @@ export default function FoodSearchWidget() {
 	const [foodList, setFoodList] = useState<Food[]>([]);
 	const [selectedFood, setSelectedFood] = useState<Food>();
 
-	useEffect(() => {
-		async function fetchData() {
-			try {
-				const results = await searchFoodsByTerm(searchTerm, 10);
-				if (results) {
-					setFoodList(results);
-				}
-				else{
-					setFoodList([])
-				}
-			} catch (error) {
-				// Handle the error, e.g., show an error message to the user
-				console.log(error);
+	async function fetchData() {
+		try {
+			console.log("st:", searchTerm);
+			const results = await searchFoodsByTerm(searchTerm, 10);
+			if (results) {
+				setFoodList(results);
+			} else {
+				setFoodList([]);
 			}
+		} catch (error) {
+			// Handle the error, e.g., show an error message to the user
+			console.log(error);
 		}
+	}
+
+	useEffect(() => {
 		if (!searchTerm || searchTerm.length === 0 || searchTerm === "") {
 			setFoodList([]);
 		} else {
@@ -143,11 +144,10 @@ export default function FoodSearchWidget() {
 
 			{searchMode === 1 ? (
 				<FoodSearchByName
-					searchTerm={searchTerm}
-					setSearchTerm={setSearchTerm}
 					foodList={foodList}
 					selectedFood={selectedFood}
 					setSelectedFood={setSelectedFood}
+					setFoodList={setFoodList}
 				/>
 			) : (
 				<View style={{ flex: 1 }}>

@@ -9,11 +9,24 @@ import ProfileScreen from "./Profile-Screen";
 import SignUp from "./SignUp";
 import Login from "./Login";
 import { useAuth } from "../context/AuthContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function Authentication() {
 	const [selected, setSelected] = useState(1);
 	const [selectedPreAuth, setSelectedPreAuth] = useState(2);
-	const { firebaseUser } = useAuth();
+	const [firebaseUser, setFirebaseUser] = useState(null);
+
+	useEffect(() => {
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			if (user) {
+				setFirebaseUser(user);
+			} else {
+				setFirebaseUser(null);
+			}
+		});
+		return () => unsubscribe();
+	}, [firebaseUser]);
 
 	const authPages = [
 		{

@@ -41,7 +41,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 			newFood.title === "" ||
 			newFood.servingUnits === "" ||
 			newFood.servingSize === 0 ||
-            newFood.upc
+			newFood.upc
 		) {
 			setFormComplete(false);
 		} else {
@@ -51,7 +51,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 
 	const handleFormSubmit = async () => {
 		try {
-            newFood.upc = props.unkownUpc;
+			newFood.upc = props.unkownUpc;
 			const result = await createFood(newFood);
 
 			if (result.id) {
@@ -100,7 +100,20 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 						}}
 					>
 						<TouchableOpacity
-							onPress={() => props.setUnkownUpc(null)}
+							onPress={() => {
+								props.setUnkownUpc(null);
+								setNewFood({
+									title: "",
+									upc: null,
+									calories: 0,
+									protein: 0,
+									carbohydrates: 0,
+									fat: 0,
+									servingSize: 0,
+									servingUnits: "",
+									verified: false,
+								});
+							}}
 						>
 							<Feather name="x" size={24} color="black" />
 						</TouchableOpacity>
@@ -214,7 +227,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 										setNewFood({
 											title: newFood.title,
 											upc: newFood.upc,
-											calories: parseFloat(a),
+											calories: a ? parseFloat(a) : 0,
 											protein: newFood.protein,
 											carbohydrates:
 												newFood.carbohydrates,
@@ -267,7 +280,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 											title: newFood.title,
 											upc: newFood.upc,
 											calories: newFood.calories,
-											protein: parseFloat(a),
+											protein: a ? parseFloat(a) : 0,
 											carbohydrates:
 												newFood.carbohydrates,
 											fat: newFood.fat,
@@ -322,7 +335,9 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 											upc: newFood.upc,
 											calories: newFood.calories,
 											protein: newFood.protein,
-											carbohydrates: parseFloat(a),
+											carbohydrates: a
+												? parseFloat(a)
+												: 0,
 											fat: newFood.fat,
 											servingSize: newFood.servingSize,
 											servingUnits: newFood.servingUnits,
@@ -375,7 +390,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 											protein: newFood.protein,
 											carbohydrates:
 												newFood.carbohydrates,
-											fat: parseFloat(a),
+											fat: a ? parseFloat(a) : 0,
 											servingSize: newFood.servingSize,
 											servingUnits: newFood.servingUnits,
 											verified: newFood.verified,
@@ -438,7 +453,9 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 												carbohydrates:
 													newFood.carbohydrates,
 												fat: newFood.fat,
-												servingSize: parseFloat(a),
+												servingSize: a
+													? parseFloat(a)
+													: 0,
 												servingUnits:
 													newFood.servingUnits,
 												verified: newFood.verified,

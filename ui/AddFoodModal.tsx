@@ -12,61 +12,100 @@ import {
 	MaterialCommunityIcons,
 	MaterialIcons,
 } from "@expo/vector-icons";
-import Ring from "./Ring";
-import {
-	CalculateFoodMacroPercentages,
-	MacrosPercentages,
-} from "../logic/MathFunctions";
 import { Food } from "../api/models/food.model";
+import { createFoodEntry } from "../api/food_entry_service";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "react-native-toast-notifications";
 
 interface AddFoodModalProps {
 	selectedFood: Food;
 	setSelectedFood: (data: Food) => void;
 }
 
-export default function AddFoodModal(props: AddFoodModalProps) {
-	const [amount, setAmount] = useState<string>(props.selectedFood?.servingSize.toString());
-	const [foodColor, setFoodColor] = useState<string>();
-	const [macrosPercentages, setMacrosPercentages] =
-		useState<MacrosPercentages>({ protein: 0, fat: 0, carbs: 0, other: 0 });
+export default function AddFoodModal({
+	selectedFood,
+	setSelectedFood,
+}: AddFoodModalProps) {
+	const [foodEntry, setFoodEntry] = useState<Food>({
+		id: 0,
+		title: "",
+		upc: "",
+		calories: 0,
+		protein: 0,
+		carbohydrates: 0,
+		fat: 0,
+		servingSize: 0,
+		servingUnits: 0,
+		verified: false,
+	});
+	const { firebaseUser } = useAuth();
+	const toast = useToast();
 
 	useEffect(() => {
-		if (props.selectedFood) {
-			setAmount(props.selectedFood.servingSize.toString())
-			const { carbohydrates, protein, fat } = props.selectedFood;
-			const maxNutrient = Math.max(
-				carbohydrates ?? 0,
-				protein ?? 0,
-				fat ?? 0
-			);
-
-			const foodColor =
-				maxNutrient === carbohydrates
-					? "yellow"
-					: maxNutrient === protein
-					? "blue"
-					: maxNutrient === fat
-					? "red"
-					: "black";
-
-			setMacrosPercentages(
-				CalculateFoodMacroPercentages(
-					props.selectedFood.carbohydrates,
-					props.selectedFood.protein,
-					props.selectedFood.fat
-				)
-			);
-			setFoodColor(foodColor);
-		} else {
-			setFoodColor("black");
+		if (selectedFood && selectedFood.title !== foodEntry.title) {
+			setFoodEntry(selectedFood);
+		} else if (!selectedFood) {
+			setFoodEntry({
+				id: 0,
+				title: "",
+				upc: "",
+				calories: 0,
+				protein: 0,
+				carbohydrates: 0,
+				fat: 0,
+				servingSize: 0,
+				servingUnits: 0,
+				verified: false,
+			});
 		}
-	}, [props.selectedFood]);
+	}, [selectedFood]);
+
+	function changeServingSize(value: string) {
+		if (value.length < 0 || isNaN(parseInt(value))) {
+			value = "0";
+		}
+
+		const newServingSize = parseInt(value);
+		const baseServingSize = selectedFood.servingSize;
+
+		const servingMultiplier =
+			newServingSize === 0 ? 0 : newServingSize / baseServingSize;
+
+		setFoodEntry({
+			id: foodEntry.id,
+			title: foodEntry.title,
+			upc: foodEntry.upc,
+			calories: Math.round(selectedFood.calories * servingMultiplier),
+			protein: Math.round(selectedFood.protein * servingMultiplier),
+			carbohydrates: Math.round(
+				selectedFood.carbohydrates * servingMultiplier
+			),
+			fat: Math.round(selectedFood.fat * servingMultiplier),
+			servingSize: newServingSize,
+			servingUnits: foodEntry.servingUnits,
+			verified: foodEntry.verified,
+		});
+	}
+
+	const handleAddedFood = () => {
+		let result = createFoodEntry(foodEntry, firebaseUser.uid);
+
+		if(result){
+			toast.show("Successfully added new food entry", {
+				type: "success",
+				placement: "top",
+				duration: 1000,
+				animationType: "slide-in",
+			});
+			setSelectedFood(null);
+		}
+	}
 
 	return (
 		<Modal
 			animationType="slide"
 			transparent={false}
-			visible={props.selectedFood ? true : false}
+			visible={selectedFood ? true : false}
 		>
 			<View style={{ backgroundColor: "#f9f9f9", flex: 1 }}>
 				<SafeAreaView
@@ -85,9 +124,7 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 							padding: 20,
 						}}
 					>
-						<TouchableOpacity
-							onPress={() => props.setSelectedFood(null)}
-						>
+						<TouchableOpacity onPress={() => setSelectedFood(null)}>
 							<Feather name="x" size={24} color="black" />
 						</TouchableOpacity>
 					</View>
@@ -116,10 +153,10 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 							<MaterialCommunityIcons
 								name="silverware"
 								size={24}
-								color={foodColor}
+								color={"black"}
 							/>
 							<Text style={{ fontWeight: "bold", fontSize: 20 }}>
-								{props.selectedFood?.title}
+								{selectedFood?.title}
 							</Text>
 							<MaterialIcons
 								name="verified"
@@ -152,8 +189,8 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 							>
 								<TextInput
 									keyboardType="numeric"
-									value={amount}
-									onChangeText={(a) => setAmount(a)}
+									value={foodEntry.servingSize.toString()}
+									onChangeText={(a) => changeServingSize(a)}
 									placeholder="10"
 									textAlign="right"
 									style={{
@@ -162,72 +199,18 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 										paddingHorizontal: 3,
 									}}
 								/>
-								<Text>{props.selectedFood?.servingUnits}</Text>
+								{(() => {
+									switch (selectedFood?.servingUnits) {
+										case 0:
+											return <Text>g</Text>;
+										case 1:
+											return <Text>ml</Text>;
+										case 2:
+											return <Text>oz</Text>;
+									}
+								})()}
 							</View>
 						</View>
-						{/* <View
-							style={{
-								flexDirection: "column",
-								justifyContent: "flex-start",
-								alignItems: "flex-start",
-								width: "100%",
-							}}
-						>
-							<Text style={{ fontWeight: "bold" }}>
-								Serving Size
-							</Text>
-							<View
-								style={{
-									flexDirection: "row",
-									flexWrap: "wrap",
-									justifyContent: "flex-start",
-									alignItems: "flex-start",
-									gap: 5,
-									marginTop: 5,
-								}}
-							>
-								{props.selectedFood?.measurements?.map((m) => {
-									return (
-										<TouchableOpacity
-											key={m.label}
-											style={
-												selectedMeasurement &&
-												selectedMeasurement === m.label
-													? {
-															backgroundColor:
-																"#2465FD",
-															paddingVertical: 5,
-															paddingHorizontal: 10,
-															borderRadius: 20,
-													  }
-													: {
-															backgroundColor:
-																"rgba(0,0,0,.2)",
-															paddingVertical: 5,
-															paddingHorizontal: 10,
-															borderRadius: 20,
-													  }
-											}
-											onPress={() =>
-												setSelectedMeasurement(m.label)
-											}
-										>
-											<Text
-												style={
-													selectedMeasurement &&
-													selectedMeasurement ===
-														m.label
-														? { color: "white" }
-														: { color: "#2465FD" }
-												}
-											>
-												{m.label}
-											</Text>
-										</TouchableOpacity>
-									);
-								})}
-							</View>
-						</View> */}
 					</View>
 
 					<View
@@ -257,39 +240,13 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 
 						<View
 							style={{
+								width: "100%",
 								flexDirection: "row",
-								justifyContent: "center",
-								alignItems: "center",
+								justifyContent: "flex-start",
+								alignItems: "flex-start",
 								gap: 20,
 							}}
 						>
-							<View
-								style={{
-									flex: 1,
-									justifyContent: "center",
-									alignItems: "center",
-								}}
-							>
-								<Ring
-									size={200}
-									color1="red"
-									color2="blue"
-									color3="green"
-									color4={"black"}
-									length1={macrosPercentages.carbs}
-									length2={macrosPercentages.protein}
-									length3={macrosPercentages.fat}
-									kcals={(
-										Math.round(
-											props.selectedFood?.calories
-										) *
-										(parseInt(amount)
-											? Math.floor(parseInt(amount)/props.selectedFood.servingSize)
-											: 1)
-									).toString()}
-								/>
-							</View>
-
 							<View
 								style={{
 									flexDirection: "column",
@@ -304,30 +261,20 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 										fontWeight: "bold",
 									}}
 								>
-									Protein (
-									{Math.round(
-										macrosPercentages.protein * 100
-									)}
-									%) -{" "}
-									{Math.round(props.selectedFood?.protein) *
-										(parseInt(amount)
-											? Math.floor(parseInt(amount)/props.selectedFood.servingSize)
-											: 1)}
-									g
+									Calories - {foodEntry.calories} Kcals
+								</Text>
+								<Text
+									style={{
+										color: "blue",
+										fontWeight: "bold",
+									}}
+								>
+									Protein - {foodEntry.protein} g
 								</Text>
 								<Text
 									style={{ color: "red", fontWeight: "bold" }}
 								>
-									Carbs (
-									{Math.round(macrosPercentages.carbs * 100)}
-									%) -{" "}
-									{Math.round(
-										props.selectedFood?.carbohydrates
-									) *
-										(parseInt(amount)
-											? Math.floor(parseInt(amount)/props.selectedFood.servingSize)
-											: 1)}
-									g
+									Carbs - {foodEntry.carbohydrates} g
 								</Text>
 								<Text
 									style={{
@@ -335,27 +282,43 @@ export default function AddFoodModal(props: AddFoodModalProps) {
 										fontWeight: "bold",
 									}}
 								>
-									fats (
-									{Math.round(macrosPercentages.fat * 100)}%)
-									-{" "}
-									{Math.round(props.selectedFood?.fat) *
-										(parseInt(amount)
-											? Math.floor(parseInt(amount)/props.selectedFood.servingSize)
-											: 1)}
-									g
-								</Text>
-								<Text
-									style={{
-										color: "black",
-										fontWeight: "bold",
-									}}
-								>
-									Other (
-									{Math.round(macrosPercentages.other * 100)}
-									%)
+									fats - {foodEntry.fat} g
 								</Text>
 							</View>
 						</View>
+					</View>
+
+					<View
+						style={{
+							flexDirection: "row",
+							gap: 30,
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+					>
+						<TouchableOpacity
+							style={{
+								paddingVertical: 20,
+								paddingHorizontal: 50,
+								borderRadius: 20,
+								borderWidth: 1,
+								borderColor: "red",
+							}}
+						>
+							<Text style={{ color: "black" }}>Cancel</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							onPress={handleAddedFood}
+							style={{
+								paddingVertical: 20,
+								paddingHorizontal: 50,
+								borderRadius: 20,
+								borderWidth: 1,
+								borderColor: "green",
+							}}
+						>
+							<Text style={{ color: "green" }}>Add Food</Text>
+						</TouchableOpacity>
 					</View>
 				</SafeAreaView>
 			</View>

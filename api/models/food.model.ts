@@ -7,7 +7,7 @@ export class Food {
 	carbohydrates: number;
 	fat: number;
 	servingSize: number;
-	servingUnits: string;
+	servingUnits: ServingSizeUnits;
 	verified: boolean;
 
 	constructor(
@@ -18,7 +18,7 @@ export class Food {
 		carbohydrates: number,
 		fat: number,
 		servingSize: number,
-		servingUnits: string,
+		servingUnits: ServingSizeUnits,
 		verified: boolean,
 		id?: number
 	) {
@@ -33,4 +33,10 @@ export class Food {
 		this.servingUnits = servingUnits;
 		this.verified = verified;
 	}
+}
+
+export enum ServingSizeUnits{
+	GRAMS = 0,
+	MILLILITER = 1,
+	OUNCES = 2,
 }

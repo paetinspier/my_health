@@ -2,48 +2,96 @@ import { View, Text } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { auth, db } from "../firebaseConfig";
 import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDocs,
+	onSnapshot,
+	query,
+	where,
+} from "firebase/firestore";
+import { useAuth } from "../context/AuthContext";
 
 export default function MacrosWidget() {
 	const userUid = auth.currentUser?.uid;
-	const [targetProtein, setTargetProtein] = useState(2000);
-	const [targetCarbs, setTargetCarbs] = useState(2000);
-	const [targetFats, setTargetFats] = useState(2000);
-	const [targetCals, setTargetCals] = useState(
-		targetProtein * 4 + targetCarbs * 4 + targetFats * 9
-	);
-	const [currentProtein, setCurrentProtein] = useState(170);
-	const [currentCarbs, setCurrentCarbs] = useState(100);
-	const [currentFats, setCurrentFats] = useState(100);
-	const [currentCals, setCurrentCals] = useState(
-		currentProtein * 4 + currentCarbs * 4 + currentFats * 9
-	);
-	const [calPercent, setCalPercent] = useState((currentCals / targetCals)*100);
-	const [proteinPercent, setProteinPercent] = useState(
-		(currentProtein / targetProtein)*100
-	);
-	const [carbsPercent, setCarbsPercent] = useState(
-		(currentCarbs / targetCarbs)*100
-	);
-	const [fatsPercent, setFatsPercent] = useState(currentFats / targetFats);
+	const [targetProtein, setTargetProtein] = useState(0);
+	const [targetCarbs, setTargetCarbs] = useState(0);
+	const [targetFats, setTargetFats] = useState(0);
+	const [targetCals, setTargetCals] = useState(0);
+	const [currentProtein, setCurrentProtein] = useState(0);
+	const [currentCarbs, setCurrentCarbs] = useState(0);
+	const [currentFats, setCurrentFats] = useState(0);
+	const [currentCals, setCurrentCals] = useState(0);
+	const [calPercent, setCalPercent] = useState<number>();
+	const [proteinPercent, setProteinPercent] = useState<number>();
+	const [carbsPercent, setCarbsPercent] = useState<number>();
+	const [fatsPercent, setFatsPercent] = useState<number>();
+	const { firebaseUser } = useAuth();
 
 	useEffect(() => {
-		const unsub = onSnapshot(doc(db, "macros", userUid), (doc) => {
+		setCalPercent(
+			currentCals > 0 && targetCals > 0
+				? (currentCals / targetCals) * 100
+				: 0
+		);
+		setProteinPercent(
+			currentProtein > 0 && targetProtein > 0
+				? (currentProtein / targetProtein) * 100
+				: 0
+		);
+		setCarbsPercent(
+			currentCarbs > 0 && targetCarbs > 0
+				? (currentCarbs / targetCarbs) * 100
+				: 0
+		);
+		setFatsPercent(
+			currentFats > 0 && targetFats > 0
+				? (currentFats / targetFats) * 100
+				: 0
+		);
+	}, [
+		targetCals,
+		targetCarbs,
+		targetFats,
+		targetProtein,
+		currentCals,
+		currentCarbs,
+		currentProtein,
+		currentFats,
+	]);
+
+	useEffect(() => {
+		const unsub1 = onSnapshot(doc(db, "macros", userUid), (doc) => {
 			if (doc.data()) {
 				setTargetProtein(doc.data().targetProtein);
 				setTargetCarbs(doc.data().targetCarbs);
 				setTargetFats(doc.data().targetFats);
+				setTargetCals(doc.data().targetCals);
 			}
 		});
-	}, []);
 
-	useEffect(() => {
-		setTargetCals(targetProtein * 4 + targetCarbs * 4 + targetFats * 9);
-		setCalPercent((currentCals / targetCals)*100);
-		setProteinPercent((currentProtein / targetProtein)*100);
-		setCarbsPercent((currentCarbs / targetCarbs)*100);
-		setFatsPercent((currentFats / targetFats)*100);
-	}, [targetCarbs, targetFats, targetProtein]);
+		const food_entry_query = query(collection(db, "food_entries"), where("uid", "==", firebaseUser.uid));
+		const unsubscribe = onSnapshot(food_entry_query, (querySnapshot) => {
+			let foods = [];
+			let totalCals = 0;
+			let totalCarbs = 0;
+			let totalProteins = 0;
+			let totalFats = 0;
+			querySnapshot.forEach((doc) => {
+				foods.push(doc.data());
+				totalCals += doc.data().calories;
+				totalCarbs += doc.data().carbohydrates;
+				totalFats += doc.data().fats;
+				totalProteins += doc.data().proteins;
+			});
+			
+
+			setCurrentCals(totalCals);
+			setCurrentCarbs(totalCarbs);
+			setCurrentFats(totalFats);
+			setCurrentProtein(totalProteins);
+		});
+	}, []);
 
 	return (
 		<View

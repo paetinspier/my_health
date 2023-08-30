@@ -44,12 +44,11 @@ export async function searchFoodsByTerm(
 ): Promise<Food[]> {
 	try {
 		const result = await axios.get<Food[]>(
-			`${process.env.EXPO_PUBLIC_FOOD_DATABASE_API}/food/search?term=${searchTerm}&limit=${limit}`
+			`${process.env.EXPO_PUBLIC_FOOD_DATABASE_API}/food/search/${searchTerm}/${limit}`
 		);
-
 		return result.data;
 	} catch (error) {
-		console.log(error);
+		console.log('food database api',error);
 		throw error;
 	}
 }

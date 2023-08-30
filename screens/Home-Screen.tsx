@@ -22,7 +22,7 @@ export default function HomeScreen() {
 			>
 				<MacrosWidget />
 				<WeightWidget />
-				<T1DWidget />
+				{/* <T1DWidget /> */}
 			</ScrollView>
 		</View>
 	);

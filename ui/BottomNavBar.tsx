@@ -10,12 +10,12 @@ function BottomNavBar({selected, setSelected}) {
 			selectedIcon: <AntDesign name="home" size={24} color="black" />,
 			text: "Home",
 		},
-		{
-			id: 2,
-			icon: <Fontisto name="blood-drop" size={24} color="gray" />,
-			selectedIcon: <Fontisto name="blood-drop" size={24} color="black" />,
-			text: "T1D",
-		},
+		// {
+		// 	id: 2,
+		// 	icon: <Fontisto name="blood-drop" size={24} color="gray" />,
+		// 	selectedIcon: <Fontisto name="blood-drop" size={24} color="black" />,
+		// 	text: "T1D",
+		// },
 		{
 			id: 3,
 			icon: <MaterialCommunityIcons name="food-drumstick" size={24} color="gray" />,

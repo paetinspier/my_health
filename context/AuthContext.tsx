@@ -4,7 +4,7 @@ import {
 	userSignIn,
 	userSignUp,
 } from "../api/firebaseAuthentication";
-import { onAuthStateChanged } from "firebase/auth";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 
 export const AuthContext = createContext({});
@@ -14,7 +14,7 @@ export default AuthContext;
 export const useAuth = () => useContext<any>(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [firebaseUser, setFirebaseUser] = useState(null);
+	const [firebaseUser, setFirebaseUser] = useState<User|null>(null);
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			}
 		});
 		return () => unsubscribe();
-	}, []);
+	}, [firebaseUser]);
 
 	const signUp = (
 		email: string,
