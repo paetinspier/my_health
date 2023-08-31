@@ -69,29 +69,35 @@ export default function MacrosWidget() {
 				setTargetCals(doc.data().targetCals);
 			}
 		});
+		if (firebaseUser && firebaseUser.uid) {
+			const food_entry_query = query(
+				collection(db, "food_entries"),
+				where("uid", "==", firebaseUser.uid)
+			);
+			const unsubscribe = onSnapshot(
+				food_entry_query,
+				(querySnapshot) => {
+					let foods = [];
+					let totalCals = 0;
+					let totalCarbs = 0;
+					let totalProteins = 0;
+					let totalFats = 0;
+					querySnapshot.forEach((doc) => {
+						foods.push(doc.data());
+						totalCals += doc.data().calories;
+						totalCarbs += doc.data().carbohydrates;
+						totalFats += doc.data().fats;
+						totalProteins += doc.data().proteins;
+					});
 
-		const food_entry_query = query(collection(db, "food_entries"), where("uid", "==", firebaseUser.uid));
-		const unsubscribe = onSnapshot(food_entry_query, (querySnapshot) => {
-			let foods = [];
-			let totalCals = 0;
-			let totalCarbs = 0;
-			let totalProteins = 0;
-			let totalFats = 0;
-			querySnapshot.forEach((doc) => {
-				foods.push(doc.data());
-				totalCals += doc.data().calories;
-				totalCarbs += doc.data().carbohydrates;
-				totalFats += doc.data().fats;
-				totalProteins += doc.data().proteins;
-			});
-			
-
-			setCurrentCals(totalCals);
-			setCurrentCarbs(totalCarbs);
-			setCurrentFats(totalFats);
-			setCurrentProtein(totalProteins);
-		});
-	}, []);
+					setCurrentCals(totalCals);
+					setCurrentCarbs(totalCarbs);
+					setCurrentFats(totalFats);
+					setCurrentProtein(totalProteins);
+				}
+			);
+		}
+	}, [firebaseUser]);
 
 	return (
 		<View

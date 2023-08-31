@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Food } from "../api/models/food.model";
+import { Food, ServingSizeUnits } from "../api/models/food.model";
 import { createFood } from "../api/foodDatabaseApi";
 import { useToast } from "react-native-toast-notifications";
 
@@ -30,19 +30,14 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 		carbohydrates: 0,
 		fat: 0,
 		servingSize: 0,
-		servingUnits: "",
+		servingUnits: ServingSizeUnits.GRAMS,
 		verified: false,
 	});
 	const [formComplete, setFormComplete] = useState(false);
 	const toast = useToast();
 
 	useEffect(() => {
-		if (
-			newFood.title === "" ||
-			newFood.servingUnits === "" ||
-			newFood.servingSize === 0 ||
-			newFood.upc
-		) {
+		if (newFood.title === "" || newFood.servingSize === 0 || newFood.upc) {
 			setFormComplete(false);
 		} else {
 			setFormComplete(true);
@@ -110,7 +105,7 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 									carbohydrates: 0,
 									fat: 0,
 									servingSize: 0,
-									servingUnits: "",
+									servingUnits: ServingSizeUnits.GRAMS,
 									verified: false,
 								});
 							}}
@@ -416,6 +411,8 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 								borderBottomColor: "gray",
 								borderBottomWidth: 1,
 								paddingHorizontal: 20,
+								paddingBottom: 20,
+								gap: 10
 							}}
 						>
 							<View
@@ -485,18 +482,28 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 								<View
 									style={{
 										flexDirection: "row",
+										gap: 10,
+										justifyContent: "space-between",
 										alignItems: "center",
-										height: 40,
-										margin: 12,
-										borderWidth: 1,
-										borderRadius: 20,
-										width: "50%",
-										paddingRight: 10,
 									}}
 								>
-									<TextInput
-										value={newFood?.servingUnits}
-										onChangeText={(a) =>
+									<TouchableOpacity
+										style={
+											newFood.servingUnits === 0
+												? {
+														paddingHorizontal: 8,
+														paddingVertical: 4,
+														borderRadius: 10,
+														borderWidth: 1,
+														borderColor: "blue",
+												  }
+												: {
+														paddingHorizontal: 4,
+														paddingVertical: 2,
+														borderRadius: 10,
+												  }
+										}
+										onPress={() =>
 											setNewFood({
 												title: newFood.title,
 												upc: newFood.upc,
@@ -507,18 +514,117 @@ export default function NewFoodModal(props: NewFoodModalProps) {
 												fat: newFood.fat,
 												servingSize:
 													newFood.servingSize,
-												servingUnits: a,
+												servingUnits: 0,
 												verified: newFood.verified,
 											})
 										}
-										placeholder="Serving size units..."
-										textAlign="left"
-										style={{
-											flex: 1,
-											paddingVertical: 10,
-											paddingHorizontal: 3,
-										}}
-									/>
+									>
+										<Text
+											style={
+												newFood.servingUnits === 0
+													? {
+															color: "blue",
+													  }
+													: {
+															color: "black",
+													  }
+											}
+										>
+											Grams
+										</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={
+											newFood.servingUnits === 1
+												? {
+														paddingHorizontal: 8,
+														paddingVertical: 4,
+														borderRadius: 10,
+														borderWidth: 1,
+														borderColor: "blue",
+												  }
+												: {
+														paddingHorizontal: 4,
+														paddingVertical: 2,
+														borderRadius: 10,
+												  }
+										}
+										onPress={() =>
+											setNewFood({
+												title: newFood.title,
+												upc: newFood.upc,
+												calories: newFood.calories,
+												protein: newFood.protein,
+												carbohydrates:
+													newFood.carbohydrates,
+												fat: newFood.fat,
+												servingSize:
+													newFood.servingSize,
+												servingUnits: 1,
+												verified: newFood.verified,
+											})
+										}
+									>
+										<Text
+											style={
+												newFood.servingUnits === 1
+													? {
+															color: "blue",
+													  }
+													: {
+															color: "black",
+													  }
+											}
+										>
+											Milliters
+										</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={
+											newFood.servingUnits === 2
+												? {
+														paddingHorizontal: 8,
+														paddingVertical: 4,
+														borderRadius: 10,
+														borderWidth: 1,
+														borderColor: "blue",
+												  }
+												: {
+														paddingHorizontal: 4,
+														paddingVertical: 2,
+														borderRadius: 10,
+												  }
+										}
+										onPress={() =>
+											setNewFood({
+												title: newFood.title,
+												upc: newFood.upc,
+												calories: newFood.calories,
+												protein: newFood.protein,
+												carbohydrates:
+													newFood.carbohydrates,
+												fat: newFood.fat,
+												servingSize:
+													newFood.servingSize,
+												servingUnits: 2,
+												verified: newFood.verified,
+											})
+										}
+									>
+										<Text
+											style={
+												newFood.servingUnits === 2
+													? {
+															color: "blue",
+													  }
+													: {
+															color: "black",
+													  }
+											}
+										>
+											Ounces
+										</Text>
+									</TouchableOpacity>
 								</View>
 							</View>
 						</View>
