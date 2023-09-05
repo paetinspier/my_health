@@ -1,8 +1,8 @@
 import { View, Text, TextInput, Button } from "react-native";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
-import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProfileScreen() {
 	const userUid = auth.currentUser?.uid;
@@ -10,9 +10,8 @@ export default function ProfileScreen() {
 	const [firstName, setFirstName] = useState(null);
 	const [lastName, setLastName] = useState(null);
 	const [email, setEmail] = useState(null);
-	const [dob, setDob] = useState(null);
-	const [isDiabetic, setIsDiabetic] = useState(null);
-	const { logout } = useContext(AuthContext);
+
+	const { logout } = useAuth();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -25,8 +24,6 @@ export default function ProfileScreen() {
 					setFirstName(userData.firstName);
 					setLastName(userData.lastName);
 					setEmail(userData.email);
-					setDob(userData.dob);
-					setIsDiabetic(userData.isDiabetic);
 				}
 			} catch (error) {
 				console.log("Error fetching data:", error);
@@ -107,25 +104,17 @@ export default function ProfileScreen() {
 				</View>
 				<View
 					style={{
+						width: '100%',
 						flexDirection: "row",
-						alignItems: "center",
+						alignItems: "flex-start",
 						height: 40,
 						margin: 12,
-						borderWidth: 1,
-						borderRadius: 20,
+						justifyContent: 'flex-start'
 					}}
 				>
-					<TextInput
-						value={email}
-						placeholder="Email"
-						onChangeText={(email) => setEmail(email)}
-						style={{
-							flex: 1,
-							padding: 10,
-						}}
-					/>
+					<Text>{email}</Text>
 				</View>
-				<View
+				{/* <View
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -144,8 +133,8 @@ export default function ProfileScreen() {
 							padding: 10,
 						}}
 					/>
-				</View>
-				<View
+				</View> */}
+				{/* <View
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -158,7 +147,7 @@ export default function ProfileScreen() {
 					<Text style={{ color: "black", flex: 1, padding: 10 }}>
 						isDiabetic: {isDiabetic ? "yes" : "no"}
 					</Text>
-				</View>
+				</View> */}
 
 				<Button title="Logout" onPress={() => logout()} color="red" />
 			</View>

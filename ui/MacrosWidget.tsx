@@ -1,16 +1,10 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { auth, db } from "../firebaseConfig";
 import { useEffect, useState } from "react";
-import {
-	collection,
-	doc,
-	getDocs,
-	onSnapshot,
-	query,
-	where,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function MacrosWidget() {
 	const userUid = auth.currentUser?.uid;
@@ -26,6 +20,8 @@ export default function MacrosWidget() {
 	const [proteinPercent, setProteinPercent] = useState<number>();
 	const [carbsPercent, setCarbsPercent] = useState<number>();
 	const [fatsPercent, setFatsPercent] = useState<number>();
+	const [date, setDate] = useState<Date>(new Date());
+	const [foodList, setFoodList] = useState<any>();
 	const { firebaseUser } = useAuth();
 
 	useEffect(() => {
@@ -83,13 +79,17 @@ export default function MacrosWidget() {
 					let totalProteins = 0;
 					let totalFats = 0;
 					querySnapshot.forEach((doc) => {
-						foods.push(doc.data());
-						totalCals += doc.data().calories;
-						totalCarbs += doc.data().carbohydrates;
-						totalFats += doc.data().fats;
-						totalProteins += doc.data().proteins;
+						if (
+							doc.data().created_at === date.toLocaleDateString()
+						) {
+							foods.push(doc.data());
+							totalCals += doc.data().calories;
+							totalCarbs += doc.data().carbohydrates;
+							totalFats += doc.data().fats;
+							totalProteins += doc.data().proteins;
+						}
 					});
-
+					setFoodList(foods);
 					setCurrentCals(totalCals);
 					setCurrentCarbs(totalCarbs);
 					setCurrentFats(totalFats);
@@ -97,7 +97,25 @@ export default function MacrosWidget() {
 				}
 			);
 		}
-	}, [firebaseUser]);
+	}, [firebaseUser, date]);
+
+	const dateForward = () => {
+		const today = new Date();
+		if (today.toLocaleDateString() !== date.toLocaleDateString()) {
+			const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+			const nextDay: Date = new Date(
+				date.getTime() + oneDayInMilliseconds
+			);
+			setDate(nextDay);
+		}
+	};
+
+	const dateBackward = () => {
+		console.log("date backward");
+		const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+		const prevDay = new Date(date.getTime() - oneDayInMilliseconds);
+		setDate(prevDay);
+	};
 
 	return (
 		<View
@@ -123,6 +141,25 @@ export default function MacrosWidget() {
 			>
 				My Macros
 			</Text>
+			<View
+				style={{
+					width: "100%",
+					flexDirection: "row",
+					justifyContent: "space-between",
+					alignItems: "center",
+					marginVertical: 10,
+				}}
+			>
+				<TouchableOpacity onPress={dateBackward}>
+					<AntDesign name="left" size={16} color="#2465FD" />
+				</TouchableOpacity>
+				<Text style={{ fontWeight: "bold" }}>
+					{date.toLocaleDateString()}
+				</Text>
+				<TouchableOpacity onPress={dateForward}>
+					<AntDesign name="right" size={16} color="#2465FD" />
+				</TouchableOpacity>
+			</View>
 			<View
 				style={{
 					justifyContent: "center",
